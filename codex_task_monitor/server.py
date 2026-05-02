@@ -91,37 +91,6 @@ def build_html(payload: dict, refresh_seconds: int = DEFAULT_REFRESH_SECONDS) ->
       padding-bottom: 5px;
       margin-bottom: 8px;
     }}
-    .fullscreen-button {{
-      border: 1px solid var(--line);
-      background: var(--paper);
-      color: var(--ink);
-      font: inherit;
-      font-size: 16px;
-      padding: 1px 6px;
-    }}
-    .fullscreen-button:disabled {{
-      color: var(--muted);
-    }}
-    body.pseudo-fullscreen {{
-      padding: 6px;
-    }}
-    body.pseudo-fullscreen .toolbar {{
-      position: fixed;
-      top: 0;
-      right: 0;
-      z-index: 10;
-      margin: 0;
-      padding: 0;
-      border-bottom: 0;
-      background: var(--paper);
-    }}
-    body.pseudo-fullscreen .toolbar span:not(:last-child) {{
-      display: none;
-    }}
-    body.pseudo-fullscreen .fullscreen-button {{
-      font-size: 12px;
-      padding: 0 3px;
-    }}
     main {{
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
@@ -216,13 +185,11 @@ def build_html(payload: dict, refresh_seconds: int = DEFAULT_REFRESH_SECONDS) ->
     <span data-refresh-region="updated-time">Updated: {_format_display_time(payload.get("generated_at"))}</span>
     <span>{int(refresh_seconds)}s</span>
     <span><a href="/">Projects</a></span>
-    <span>{_fullscreen_button()}</span>
   </nav>
   <main data-refresh-region="main">
     {tasks_html}
   </main>
   {older_tasks_html}
-  {_fullscreen_script()}
   {_refresh_script(refresh_seconds)}
 </body>
 </html>
@@ -267,37 +234,6 @@ def build_projects_html(payload: dict, refresh_seconds: int = DEFAULT_REFRESH_SE
       border-bottom: 1px solid var(--line);
       padding-bottom: 5px;
       margin-bottom: 8px;
-    }}
-    .fullscreen-button {{
-      border: 1px solid var(--line);
-      background: var(--paper);
-      color: var(--ink);
-      font: inherit;
-      font-size: 16px;
-      padding: 1px 6px;
-    }}
-    .fullscreen-button:disabled {{
-      color: var(--muted);
-    }}
-    body.pseudo-fullscreen {{
-      padding: 6px;
-    }}
-    body.pseudo-fullscreen .toolbar {{
-      position: fixed;
-      top: 0;
-      right: 0;
-      z-index: 10;
-      margin: 0;
-      padding: 0;
-      border-bottom: 0;
-      background: var(--paper);
-    }}
-    body.pseudo-fullscreen .toolbar span:not(:last-child) {{
-      display: none;
-    }}
-    body.pseudo-fullscreen .fullscreen-button {{
-      font-size: 12px;
-      padding: 0 3px;
     }}
     main {{
       display: grid;
@@ -377,12 +313,10 @@ def build_projects_html(payload: dict, refresh_seconds: int = DEFAULT_REFRESH_SE
     <span>{int(refresh_seconds)}s</span>
     <span><a href="/tasks">Tasks</a></span>
     <span><a href="/">Compact</a></span>
-    <span>{_fullscreen_button()}</span>
   </nav>
   <main data-refresh-region="main">
     {projects_html}
   </main>
-  {_fullscreen_script()}
   {_refresh_script(refresh_seconds)}
 </body>
 </html>
@@ -427,37 +361,6 @@ def build_projects_compact_html(payload: dict, refresh_seconds: int = DEFAULT_RE
       border-bottom: 1px solid var(--line);
       padding-bottom: 5px;
       margin-bottom: 8px;
-    }}
-    .fullscreen-button {{
-      border: 1px solid var(--line);
-      background: var(--paper);
-      color: var(--ink);
-      font: inherit;
-      font-size: 16px;
-      padding: 1px 6px;
-    }}
-    .fullscreen-button:disabled {{
-      color: var(--muted);
-    }}
-    body.pseudo-fullscreen {{
-      padding: 6px;
-    }}
-    body.pseudo-fullscreen .toolbar {{
-      position: fixed;
-      top: 0;
-      right: 0;
-      z-index: 10;
-      margin: 0;
-      padding: 0;
-      border-bottom: 0;
-      background: var(--paper);
-    }}
-    body.pseudo-fullscreen .toolbar span:not(:last-child) {{
-      display: none;
-    }}
-    body.pseudo-fullscreen .fullscreen-button {{
-      font-size: 12px;
-      padding: 0 3px;
     }}
     .project-list {{
       border: 2px solid var(--line);
@@ -507,12 +410,10 @@ def build_projects_compact_html(payload: dict, refresh_seconds: int = DEFAULT_RE
     <span>{int(refresh_seconds)}s</span>
     <span><a href="/tasks">Tasks</a></span>
     <span><a href="/projects">Detailed</a></span>
-    <span>{_fullscreen_button()}</span>
   </nav>
   <main class="project-list" data-refresh-region="main">
     {projects_html}
   </main>
-  {_fullscreen_script()}
   {_refresh_script(refresh_seconds)}
 </body>
 </html>
@@ -674,81 +575,6 @@ def _render_compact_project(project: dict) -> str:
       <span class="project-stats">Tasks: {total} · Active: {active} · Error: {error} · Stale: {stale} · Done: {done} · Updated: {updated_at}</span>
       <span class="project-path">{project_id}</span>
     </div>"""
-
-
-def _fullscreen_button() -> str:
-    return '<button type="button" id="fullscreen-button" class="fullscreen-button">Fullscreen</button>'
-
-
-def _fullscreen_script() -> str:
-    return """<script>
-    (function () {
-      var button = document.getElementById('fullscreen-button');
-      if (!button) return;
-      var target = document.documentElement;
-      var requestFullscreen = target.requestFullscreen ||
-        target.webkitRequestFullscreen ||
-        target.mozRequestFullScreen ||
-        target.msRequestFullscreen;
-      var exitFullscreen = document.exitFullscreen ||
-        document.webkitExitFullscreen ||
-        document.mozCancelFullScreen ||
-        document.msExitFullscreen;
-      function fullscreenElement() {
-        return document.fullscreenElement ||
-          document.webkitFullscreenElement ||
-          document.mozFullScreenElement ||
-          document.msFullscreenElement;
-      }
-      function updateButton() {
-        button.textContent = (fullscreenElement() || document.body.classList.contains('pseudo-fullscreen')) ?
-          'Exit fullscreen' :
-          'Fullscreen';
-      }
-      function enterPseudoFullscreen() {
-        document.body.classList.add('pseudo-fullscreen');
-        updateButton();
-      }
-      function exitPseudoFullscreen() {
-        document.body.classList.remove('pseudo-fullscreen');
-        updateButton();
-      }
-      function tryNativeFullscreen() {
-        if (!requestFullscreen || fullscreenElement()) return;
-        try {
-          var request = requestFullscreen.call(target);
-          if (request && request.catch) {
-            request.catch(updateButton);
-          }
-        } catch (error) {
-          updateButton();
-        }
-      }
-      function tryNativeExit() {
-        if (!exitFullscreen || !fullscreenElement()) return;
-        try {
-          exitFullscreen.call(document);
-        } catch (error) {
-          updateButton();
-        }
-      }
-      button.addEventListener('click', function () {
-        if (document.body.classList.contains('pseudo-fullscreen') || fullscreenElement()) {
-          exitPseudoFullscreen();
-          tryNativeExit();
-        } else {
-          enterPseudoFullscreen();
-          tryNativeFullscreen();
-        }
-      });
-      document.addEventListener('fullscreenchange', updateButton);
-      document.addEventListener('webkitfullscreenchange', updateButton);
-      document.addEventListener('mozfullscreenchange', updateButton);
-      document.addEventListener('MSFullscreenChange', updateButton);
-      window.addEventListener('load', enterPseudoFullscreen);
-      updateButton();
-    })();
-  </script>"""
 
 
 def _refresh_script(refresh_seconds: int) -> str:

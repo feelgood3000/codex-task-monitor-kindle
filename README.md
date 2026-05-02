@@ -12,7 +12,7 @@ It watches your local `~/.codex` session files, groups recent Codex work into ta
 - Compact project list at `/projects/compact`
 - JSON APIs at `/api/tasks` and `/api/projects`
 - Kindle-friendly typography, high contrast, and 60-second partial refresh
-- Fullscreen button with best-effort auto fullscreen
+- Minimal Kindle layout that avoids fake fullscreen controls
 - UTC+8 display times
 - Read-only access to Codex session data
 
