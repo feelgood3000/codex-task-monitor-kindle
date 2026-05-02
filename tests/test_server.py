@@ -138,10 +138,25 @@ class ServerTests(unittest.TestCase):
         self.assertIn("requestFullscreen", html)
         self.assertIn("exitFullscreen", html)
         self.assertIn("Exit fullscreen", html)
-        self.assertIn("tryAutoFullscreen", html)
+        self.assertIn("tryNativeFullscreen", html)
         self.assertIn("window.addEventListener('load'", html)
         self.assertIn("pseudo-fullscreen", html)
         self.assertNotIn("Fullscreen unavailable", html)
+
+    def test_fullscreen_uses_kindle_focus_mode_as_primary_path(self):
+        payload = {
+            "generated_at": "2026-05-02T06:00:00Z",
+            "counts": {"total": 0, "active": 0, "error": 0, "stale": 0},
+            "tasks": [],
+        }
+
+        html = build_html(payload, refresh_seconds=60)
+
+        self.assertIn(".pseudo-fullscreen .toolbar span:not(:last-child)", html)
+        self.assertIn("function enterPseudoFullscreen()", html)
+        self.assertIn("function exitPseudoFullscreen()", html)
+        self.assertIn("enterPseudoFullscreen();\n          tryNativeFullscreen();", html)
+        self.assertIn("window.addEventListener('load', enterPseudoFullscreen)", html)
 
     def test_build_html_compacts_tasks_older_than_five_minutes(self):
         payload = {
@@ -273,7 +288,7 @@ class ServerTests(unittest.TestCase):
         self.assertIn("requestFullscreen", html)
         self.assertIn("exitFullscreen", html)
         self.assertIn("Exit fullscreen", html)
-        self.assertIn("tryAutoFullscreen", html)
+        self.assertIn("tryNativeFullscreen", html)
         self.assertIn("window.addEventListener('load'", html)
         self.assertIn("pseudo-fullscreen", html)
         self.assertNotIn("Fullscreen unavailable", html)

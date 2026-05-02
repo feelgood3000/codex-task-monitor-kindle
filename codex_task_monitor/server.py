@@ -106,8 +106,21 @@ def build_html(payload: dict, refresh_seconds: int = DEFAULT_REFRESH_SECONDS) ->
       padding: 6px;
     }}
     body.pseudo-fullscreen .toolbar {{
-      margin-bottom: 5px;
-      padding-bottom: 3px;
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 10;
+      margin: 0;
+      padding: 0;
+      border-bottom: 0;
+      background: var(--paper);
+    }}
+    body.pseudo-fullscreen .toolbar span:not(:last-child) {{
+      display: none;
+    }}
+    body.pseudo-fullscreen .fullscreen-button {{
+      font-size: 12px;
+      padding: 0 3px;
     }}
     main {{
       display: grid;
@@ -270,8 +283,21 @@ def build_projects_html(payload: dict, refresh_seconds: int = DEFAULT_REFRESH_SE
       padding: 6px;
     }}
     body.pseudo-fullscreen .toolbar {{
-      margin-bottom: 5px;
-      padding-bottom: 3px;
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 10;
+      margin: 0;
+      padding: 0;
+      border-bottom: 0;
+      background: var(--paper);
+    }}
+    body.pseudo-fullscreen .toolbar span:not(:last-child) {{
+      display: none;
+    }}
+    body.pseudo-fullscreen .fullscreen-button {{
+      font-size: 12px;
+      padding: 0 3px;
     }}
     main {{
       display: grid;
@@ -417,8 +443,21 @@ def build_projects_compact_html(payload: dict, refresh_seconds: int = DEFAULT_RE
       padding: 6px;
     }}
     body.pseudo-fullscreen .toolbar {{
-      margin-bottom: 5px;
-      padding-bottom: 3px;
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 10;
+      margin: 0;
+      padding: 0;
+      border-bottom: 0;
+      background: var(--paper);
+    }}
+    body.pseudo-fullscreen .toolbar span:not(:last-child) {{
+      display: none;
+    }}
+    body.pseudo-fullscreen .fullscreen-button {{
+      font-size: 12px;
+      padding: 0 3px;
     }}
     .project-list {{
       border: 2px solid var(--line);
@@ -666,38 +705,47 @@ def _fullscreen_script() -> str:
           'Exit fullscreen' :
           'Fullscreen';
       }
-      if (!requestFullscreen || !exitFullscreen) {
+      function enterPseudoFullscreen() {
         document.body.classList.add('pseudo-fullscreen');
-        button.addEventListener('click', function () {
-          document.body.classList.toggle('pseudo-fullscreen');
-          updateButton();
-        });
         updateButton();
-        return;
+      }
+      function exitPseudoFullscreen() {
+        document.body.classList.remove('pseudo-fullscreen');
+        updateButton();
+      }
+      function tryNativeFullscreen() {
+        if (!requestFullscreen || fullscreenElement()) return;
+        try {
+          var request = requestFullscreen.call(target);
+          if (request && request.catch) {
+            request.catch(updateButton);
+          }
+        } catch (error) {
+          updateButton();
+        }
+      }
+      function tryNativeExit() {
+        if (!exitFullscreen || !fullscreenElement()) return;
+        try {
+          exitFullscreen.call(document);
+        } catch (error) {
+          updateButton();
+        }
       }
       button.addEventListener('click', function () {
-        if (fullscreenElement()) {
-          exitFullscreen.call(document);
+        if (document.body.classList.contains('pseudo-fullscreen') || fullscreenElement()) {
+          exitPseudoFullscreen();
+          tryNativeExit();
         } else {
-          requestFullscreen.call(target);
+          enterPseudoFullscreen();
+          tryNativeFullscreen();
         }
       });
-      function tryAutoFullscreen() {
-        if (fullscreenElement()) return;
-        var request = requestFullscreen.call(target);
-        if (request && request.catch) {
-          request.catch(function () {
-            updateButton();
-          });
-        }
-      }
       document.addEventListener('fullscreenchange', updateButton);
       document.addEventListener('webkitfullscreenchange', updateButton);
       document.addEventListener('mozfullscreenchange', updateButton);
       document.addEventListener('MSFullscreenChange', updateButton);
-      window.addEventListener('load', function () {
-        setTimeout(tryAutoFullscreen, 0);
-      });
+      window.addEventListener('load', enterPseudoFullscreen);
       updateButton();
     })();
   </script>"""
