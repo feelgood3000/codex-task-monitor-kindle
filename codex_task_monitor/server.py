@@ -82,24 +82,16 @@ def build_html(payload: dict, refresh_seconds: int = DEFAULT_REFRESH_SECONDS) ->
       font-size: 20px;
       line-height: 1.35;
     }}
-    header {{
-      border-bottom: 3px solid var(--line);
-      padding-bottom: 12px;
-      margin-bottom: 14px;
-    }}
-    h1 {{
-      margin: 0 0 6px;
-      font-size: 34px;
-      line-height: 1.1;
-      font-weight: 700;
-      letter-spacing: 0;
-    }}
-    .meta {{
+    .toolbar {{
       display: flex;
       flex-wrap: wrap;
-      gap: 10px 18px;
+      gap: 4px 12px;
       color: var(--muted);
-      font-size: 17px;
+      font-size: 14px;
+      line-height: 1.15;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 5px;
+      margin-bottom: 8px;
     }}
     .fullscreen-button {{
       border: 1px solid var(--line);
@@ -115,12 +107,9 @@ def build_html(payload: dict, refresh_seconds: int = DEFAULT_REFRESH_SECONDS) ->
     body.pseudo-fullscreen {{
       padding: 6px;
     }}
-    body.pseudo-fullscreen header {{
-      margin-bottom: 8px;
-      padding-bottom: 8px;
-    }}
-    body.pseudo-fullscreen h1 {{
-      font-size: 24px;
+    body.pseudo-fullscreen .toolbar {{
+      margin-bottom: 5px;
+      padding-bottom: 3px;
     }}
     .summary {{
       display: grid;
@@ -231,7 +220,6 @@ def build_html(payload: dict, refresh_seconds: int = DEFAULT_REFRESH_SECONDS) ->
     }}
     @media (max-width: 520px) {{
       body {{ padding: 12px; font-size: 18px; }}
-      h1 {{ font-size: 28px; }}
       main {{ grid-template-columns: 1fr; }}
       .summary {{ grid-template-columns: repeat(2, 1fr); }}
       .summary div:nth-child(2) {{ border-right: 0; }}
@@ -240,15 +228,12 @@ def build_html(payload: dict, refresh_seconds: int = DEFAULT_REFRESH_SECONDS) ->
   </style>
 </head>
 <body>
-  <header>
-    <h1>Kindle Codex Tasks</h1>
-    <div class="meta">
-      <span data-refresh-region="updated-time">Updated: {_format_display_time(payload.get("generated_at"))}</span>
-      <span>Refresh: {int(refresh_seconds)}s</span>
-      <span><a href="/">Projects</a></span>
-      <span>{_fullscreen_button()}</span>
-    </div>
-  </header>
+  <nav class="toolbar" aria-label="Page tools">
+    <span data-refresh-region="updated-time">Updated: {_format_display_time(payload.get("generated_at"))}</span>
+    <span>{int(refresh_seconds)}s</span>
+    <span><a href="/">Projects</a></span>
+    <span>{_fullscreen_button()}</span>
+  </nav>
   <section class="summary" aria-label="Task summary" data-refresh-region="summary">
     <div><strong>{int(counts.get("total", 0))}</strong><span>Total</span></div>
     <div><strong>{int(counts.get("active", 0))}</strong><span>Active</span></div>
@@ -296,23 +281,16 @@ def build_projects_html(payload: dict, refresh_seconds: int = DEFAULT_REFRESH_SE
       font-size: 20px;
       line-height: 1.35;
     }}
-    header {{
-      border-bottom: 3px solid var(--line);
-      padding-bottom: 12px;
-      margin-bottom: 14px;
-    }}
-    h1 {{
-      margin: 0 0 6px;
-      font-size: 34px;
-      line-height: 1.1;
-      letter-spacing: 0;
-    }}
-    .meta {{
+    .toolbar {{
       display: flex;
       flex-wrap: wrap;
-      gap: 10px 18px;
+      gap: 4px 12px;
       color: var(--muted);
-      font-size: 17px;
+      font-size: 14px;
+      line-height: 1.15;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 5px;
+      margin-bottom: 8px;
     }}
     .fullscreen-button {{
       border: 1px solid var(--line);
@@ -328,12 +306,9 @@ def build_projects_html(payload: dict, refresh_seconds: int = DEFAULT_REFRESH_SE
     body.pseudo-fullscreen {{
       padding: 6px;
     }}
-    body.pseudo-fullscreen header {{
-      margin-bottom: 8px;
-      padding-bottom: 8px;
-    }}
-    body.pseudo-fullscreen h1 {{
-      font-size: 24px;
+    body.pseudo-fullscreen .toolbar {{
+      margin-bottom: 5px;
+      padding-bottom: 3px;
     }}
     .summary {{
       display: grid;
@@ -427,7 +402,6 @@ def build_projects_html(payload: dict, refresh_seconds: int = DEFAULT_REFRESH_SE
     }}
     @media (max-width: 520px) {{
       body {{ padding: 12px; font-size: 18px; }}
-      h1 {{ font-size: 28px; }}
       main {{ grid-template-columns: 1fr; }}
       .summary {{ grid-template-columns: repeat(2, 1fr); }}
       .summary div:nth-child(2) {{ border-right: 0; }}
@@ -436,16 +410,13 @@ def build_projects_html(payload: dict, refresh_seconds: int = DEFAULT_REFRESH_SE
   </style>
 </head>
 <body>
-  <header>
-    <h1>Kindle Codex Projects</h1>
-    <div class="meta">
-      <span data-refresh-region="updated-time">Updated: {_format_display_time(payload.get("generated_at"))}</span>
-      <span>Refresh: {int(refresh_seconds)}s</span>
-      <span><a href="/tasks">Tasks</a></span>
-      <span><a href="/">Compact</a></span>
-      <span>{_fullscreen_button()}</span>
-    </div>
-  </header>
+  <nav class="toolbar" aria-label="Page tools">
+    <span data-refresh-region="updated-time">Updated: {_format_display_time(payload.get("generated_at"))}</span>
+    <span>{int(refresh_seconds)}s</span>
+    <span><a href="/tasks">Tasks</a></span>
+    <span><a href="/">Compact</a></span>
+    <span>{_fullscreen_button()}</span>
+  </nav>
   <section class="summary" aria-label="Project summary" data-refresh-region="summary">
     <div><strong>{int(counts.get("total", 0))}</strong><span>Projects</span></div>
     <div><strong>{int(counts.get("active", 0))}</strong><span>Active</span></div>
@@ -492,23 +463,16 @@ def build_projects_compact_html(payload: dict, refresh_seconds: int = DEFAULT_RE
       font-size: 20px;
       line-height: 1.35;
     }}
-    header {{
-      border-bottom: 3px solid var(--line);
-      padding-bottom: 12px;
-      margin-bottom: 14px;
-    }}
-    h1 {{
-      margin: 0 0 6px;
-      font-size: 34px;
-      line-height: 1.1;
-      letter-spacing: 0;
-    }}
-    .meta {{
+    .toolbar {{
       display: flex;
       flex-wrap: wrap;
-      gap: 10px 18px;
+      gap: 4px 12px;
       color: var(--muted);
-      font-size: 17px;
+      font-size: 14px;
+      line-height: 1.15;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 5px;
+      margin-bottom: 8px;
     }}
     .fullscreen-button {{
       border: 1px solid var(--line);
@@ -524,12 +488,9 @@ def build_projects_compact_html(payload: dict, refresh_seconds: int = DEFAULT_RE
     body.pseudo-fullscreen {{
       padding: 6px;
     }}
-    body.pseudo-fullscreen header {{
-      margin-bottom: 8px;
-      padding-bottom: 8px;
-    }}
-    body.pseudo-fullscreen h1 {{
-      font-size: 24px;
+    body.pseudo-fullscreen .toolbar {{
+      margin-bottom: 5px;
+      padding-bottom: 3px;
     }}
     .summary {{
       display: grid;
@@ -593,7 +554,6 @@ def build_projects_compact_html(payload: dict, refresh_seconds: int = DEFAULT_RE
     }}
     @media (max-width: 520px) {{
       body {{ padding: 12px; font-size: 18px; }}
-      h1 {{ font-size: 28px; }}
       .summary {{ grid-template-columns: repeat(2, 1fr); }}
       .summary div:nth-child(2) {{ border-right: 0; }}
       .summary div:nth-child(-n+2) {{ border-bottom: 1px solid var(--line); }}
@@ -602,16 +562,13 @@ def build_projects_compact_html(payload: dict, refresh_seconds: int = DEFAULT_RE
   </style>
 </head>
 <body>
-  <header>
-    <h1>Kindle Codex Project List</h1>
-    <div class="meta">
-      <span data-refresh-region="updated-time">Updated: {_format_display_time(payload.get("generated_at"))}</span>
-      <span>Refresh: {int(refresh_seconds)}s</span>
-      <span><a href="/tasks">Tasks</a></span>
-      <span><a href="/projects">Detailed</a></span>
-      <span>{_fullscreen_button()}</span>
-    </div>
-  </header>
+  <nav class="toolbar" aria-label="Page tools">
+    <span data-refresh-region="updated-time">Updated: {_format_display_time(payload.get("generated_at"))}</span>
+    <span>{int(refresh_seconds)}s</span>
+    <span><a href="/tasks">Tasks</a></span>
+    <span><a href="/projects">Detailed</a></span>
+    <span>{_fullscreen_button()}</span>
+  </nav>
   <section class="summary" aria-label="Project summary" data-refresh-region="summary">
     <div><strong>{int(counts.get("total", 0))}</strong><span>Projects</span></div>
     <div><strong>{int(counts.get("active", 0))}</strong><span>Active</span></div>

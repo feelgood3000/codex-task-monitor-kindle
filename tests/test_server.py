@@ -78,6 +78,29 @@ class ServerTests(unittest.TestCase):
 
         self.assertIn('<a href="/">Projects</a>', html)
 
+    def test_pages_use_compact_toolbar_instead_of_large_header(self):
+        tasks_payload = {
+            "generated_at": "2026-05-02T06:00:00Z",
+            "counts": {"total": 0, "active": 0, "error": 0, "stale": 0},
+            "tasks": [],
+        }
+        projects_payload = {
+            "generated_at": "2026-05-02T06:00:00Z",
+            "counts": {"total": 0, "active": 0, "error": 0, "stale": 0},
+            "projects": [],
+        }
+
+        pages = [
+            build_html(tasks_payload, refresh_seconds=60),
+            build_projects_html(projects_payload, refresh_seconds=60),
+            build_projects_compact_html(projects_payload, refresh_seconds=60),
+        ]
+
+        for html in pages:
+            self.assertIn('class="toolbar"', html)
+            self.assertNotIn("<header>", html)
+            self.assertNotIn("<h1>", html)
+
     def test_build_html_includes_fullscreen_button(self):
         payload = {
             "generated_at": "2026-05-02T06:00:00Z",
