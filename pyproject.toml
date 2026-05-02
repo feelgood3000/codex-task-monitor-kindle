@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "codex-task-monitor-kindle"
+version = "0.1.0"
+description = "Kindle-friendly read-only dashboard for local Codex task and project state."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [{ name = "feelgood3000" }]
+keywords = ["codex", "kindle", "dashboard", "task-monitor"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+]
+
+[project.scripts]
+codex-task-monitor-kindle = "codex_task_monitor.server:main"
