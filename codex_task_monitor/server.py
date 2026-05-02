@@ -56,8 +56,6 @@ def build_html(payload: dict, refresh_seconds: int = DEFAULT_REFRESH_SECONDS) ->
     if not tasks_html:
         tasks_html = '<section class="empty">No recent task movement.</section>'
     older_tasks_html = _render_older_tasks(older_tasks)
-    counts = payload.get("counts", {})
-
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -110,30 +108,6 @@ def build_html(payload: dict, refresh_seconds: int = DEFAULT_REFRESH_SECONDS) ->
     body.pseudo-fullscreen .toolbar {{
       margin-bottom: 5px;
       padding-bottom: 3px;
-    }}
-    .summary {{
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      border: 2px solid var(--line);
-      margin: 0 0 14px;
-    }}
-    .summary div {{
-      padding: 8px;
-      border-right: 1px solid var(--line);
-      text-align: center;
-    }}
-    .summary div:last-child {{ border-right: 0; }}
-    .summary strong {{
-      display: block;
-      font-size: 28px;
-      line-height: 1;
-    }}
-    .summary span {{
-      display: block;
-      font-size: 14px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-top: 4px;
     }}
     main {{
       display: grid;
@@ -221,9 +195,6 @@ def build_html(payload: dict, refresh_seconds: int = DEFAULT_REFRESH_SECONDS) ->
     @media (max-width: 520px) {{
       body {{ padding: 12px; font-size: 18px; }}
       main {{ grid-template-columns: 1fr; }}
-      .summary {{ grid-template-columns: repeat(2, 1fr); }}
-      .summary div:nth-child(2) {{ border-right: 0; }}
-      .summary div:nth-child(-n+2) {{ border-bottom: 1px solid var(--line); }}
     }}
   </style>
 </head>
@@ -234,12 +205,6 @@ def build_html(payload: dict, refresh_seconds: int = DEFAULT_REFRESH_SECONDS) ->
     <span><a href="/">Projects</a></span>
     <span>{_fullscreen_button()}</span>
   </nav>
-  <section class="summary" aria-label="Task summary" data-refresh-region="summary">
-    <div><strong>{int(counts.get("total", 0))}</strong><span>Total</span></div>
-    <div><strong>{int(counts.get("active", 0))}</strong><span>Active</span></div>
-    <div><strong>{int(counts.get("error", 0))}</strong><span>Error</span></div>
-    <div><strong>{int(counts.get("stale", 0))}</strong><span>Stale</span></div>
-  </section>
   <main data-refresh-region="main">
     {tasks_html}
   </main>
@@ -255,8 +220,6 @@ def build_projects_html(payload: dict, refresh_seconds: int = DEFAULT_REFRESH_SE
     projects_html = "\n".join(_render_project(project) for project in payload.get("projects", []))
     if not projects_html:
         projects_html = '<section class="empty">No Codex projects found.</section>'
-    counts = payload.get("counts", {})
-
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -309,30 +272,6 @@ def build_projects_html(payload: dict, refresh_seconds: int = DEFAULT_REFRESH_SE
     body.pseudo-fullscreen .toolbar {{
       margin-bottom: 5px;
       padding-bottom: 3px;
-    }}
-    .summary {{
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      border: 2px solid var(--line);
-      margin: 0 0 14px;
-    }}
-    .summary div {{
-      padding: 8px;
-      border-right: 1px solid var(--line);
-      text-align: center;
-    }}
-    .summary div:last-child {{ border-right: 0; }}
-    .summary strong {{
-      display: block;
-      font-size: 28px;
-      line-height: 1;
-    }}
-    .summary span {{
-      display: block;
-      font-size: 14px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-top: 4px;
     }}
     main {{
       display: grid;
@@ -403,9 +342,6 @@ def build_projects_html(payload: dict, refresh_seconds: int = DEFAULT_REFRESH_SE
     @media (max-width: 520px) {{
       body {{ padding: 12px; font-size: 18px; }}
       main {{ grid-template-columns: 1fr; }}
-      .summary {{ grid-template-columns: repeat(2, 1fr); }}
-      .summary div:nth-child(2) {{ border-right: 0; }}
-      .summary div:nth-child(-n+2) {{ border-bottom: 1px solid var(--line); }}
     }}
   </style>
 </head>
@@ -417,12 +353,6 @@ def build_projects_html(payload: dict, refresh_seconds: int = DEFAULT_REFRESH_SE
     <span><a href="/">Compact</a></span>
     <span>{_fullscreen_button()}</span>
   </nav>
-  <section class="summary" aria-label="Project summary" data-refresh-region="summary">
-    <div><strong>{int(counts.get("total", 0))}</strong><span>Projects</span></div>
-    <div><strong>{int(counts.get("active", 0))}</strong><span>Active</span></div>
-    <div><strong>{int(counts.get("error", 0))}</strong><span>Error</span></div>
-    <div><strong>{int(counts.get("stale", 0))}</strong><span>Stale</span></div>
-  </section>
   <main data-refresh-region="main">
     {projects_html}
   </main>
@@ -437,8 +367,6 @@ def build_projects_compact_html(payload: dict, refresh_seconds: int = DEFAULT_RE
     projects_html = "\n".join(_render_compact_project(project) for project in payload.get("projects", []))
     if not projects_html:
         projects_html = '<section class="empty">No Codex projects found.</section>'
-    counts = payload.get("counts", {})
-
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -492,30 +420,6 @@ def build_projects_compact_html(payload: dict, refresh_seconds: int = DEFAULT_RE
       margin-bottom: 5px;
       padding-bottom: 3px;
     }}
-    .summary {{
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      border: 2px solid var(--line);
-      margin: 0 0 14px;
-    }}
-    .summary div {{
-      padding: 8px;
-      border-right: 1px solid var(--line);
-      text-align: center;
-    }}
-    .summary div:last-child {{ border-right: 0; }}
-    .summary strong {{
-      display: block;
-      font-size: 28px;
-      line-height: 1;
-    }}
-    .summary span {{
-      display: block;
-      font-size: 14px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-top: 4px;
-    }}
     .project-list {{
       border: 2px solid var(--line);
     }}
@@ -554,9 +458,6 @@ def build_projects_compact_html(payload: dict, refresh_seconds: int = DEFAULT_RE
     }}
     @media (max-width: 520px) {{
       body {{ padding: 12px; font-size: 18px; }}
-      .summary {{ grid-template-columns: repeat(2, 1fr); }}
-      .summary div:nth-child(2) {{ border-right: 0; }}
-      .summary div:nth-child(-n+2) {{ border-bottom: 1px solid var(--line); }}
       .project-row {{ grid-template-columns: 1fr; }}
     }}
   </style>
@@ -569,12 +470,6 @@ def build_projects_compact_html(payload: dict, refresh_seconds: int = DEFAULT_RE
     <span><a href="/projects">Detailed</a></span>
     <span>{_fullscreen_button()}</span>
   </nav>
-  <section class="summary" aria-label="Project summary" data-refresh-region="summary">
-    <div><strong>{int(counts.get("total", 0))}</strong><span>Projects</span></div>
-    <div><strong>{int(counts.get("active", 0))}</strong><span>Active</span></div>
-    <div><strong>{int(counts.get("error", 0))}</strong><span>Error</span></div>
-    <div><strong>{int(counts.get("stale", 0))}</strong><span>Stale</span></div>
-  </section>
   <main class="project-list" data-refresh-region="main">
     {projects_html}
   </main>

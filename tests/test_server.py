@@ -101,6 +101,30 @@ class ServerTests(unittest.TestCase):
             self.assertNotIn("<header>", html)
             self.assertNotIn("<h1>", html)
 
+    def test_pages_do_not_render_summary_blocks(self):
+        tasks_payload = {
+            "generated_at": "2026-05-02T06:00:00Z",
+            "counts": {"total": 1, "active": 1, "error": 0, "stale": 0},
+            "tasks": [],
+        }
+        projects_payload = {
+            "generated_at": "2026-05-02T06:00:00Z",
+            "counts": {"total": 1, "active": 1, "error": 0, "stale": 0},
+            "projects": [],
+        }
+
+        pages = [
+            build_html(tasks_payload, refresh_seconds=60),
+            build_projects_html(projects_payload, refresh_seconds=60),
+            build_projects_compact_html(projects_payload, refresh_seconds=60),
+        ]
+
+        for html in pages:
+            self.assertNotIn('class="summary"', html)
+            self.assertNotIn('data-refresh-region="summary"', html)
+            self.assertNotIn('aria-label="Task summary"', html)
+            self.assertNotIn('aria-label="Project summary"', html)
+
     def test_build_html_includes_fullscreen_button(self):
         payload = {
             "generated_at": "2026-05-02T06:00:00Z",
