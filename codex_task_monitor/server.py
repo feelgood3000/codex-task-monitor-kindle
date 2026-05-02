@@ -112,6 +112,16 @@ def build_html(payload: dict, refresh_seconds: int = DEFAULT_REFRESH_SECONDS) ->
     .fullscreen-button:disabled {{
       color: var(--muted);
     }}
+    body.pseudo-fullscreen {{
+      padding: 6px;
+    }}
+    body.pseudo-fullscreen header {{
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+    }}
+    body.pseudo-fullscreen h1 {{
+      font-size: 24px;
+    }}
     .summary {{
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -235,7 +245,7 @@ def build_html(payload: dict, refresh_seconds: int = DEFAULT_REFRESH_SECONDS) ->
     <div class="meta">
       <span data-refresh-region="updated-time">Updated: {_format_display_time(payload.get("generated_at"))}</span>
       <span>Refresh: {int(refresh_seconds)}s</span>
-      <span><a href="/projects">Projects</a></span>
+      <span><a href="/">Projects</a></span>
       <span>{_fullscreen_button()}</span>
     </div>
   </header>
@@ -314,6 +324,16 @@ def build_projects_html(payload: dict, refresh_seconds: int = DEFAULT_REFRESH_SE
     }}
     .fullscreen-button:disabled {{
       color: var(--muted);
+    }}
+    body.pseudo-fullscreen {{
+      padding: 6px;
+    }}
+    body.pseudo-fullscreen header {{
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+    }}
+    body.pseudo-fullscreen h1 {{
+      font-size: 24px;
     }}
     .summary {{
       display: grid;
@@ -421,8 +441,8 @@ def build_projects_html(payload: dict, refresh_seconds: int = DEFAULT_REFRESH_SE
     <div class="meta">
       <span data-refresh-region="updated-time">Updated: {_format_display_time(payload.get("generated_at"))}</span>
       <span>Refresh: {int(refresh_seconds)}s</span>
-      <span><a href="/">Tasks</a></span>
-      <span><a href="/projects/compact">Compact</a></span>
+      <span><a href="/tasks">Tasks</a></span>
+      <span><a href="/">Compact</a></span>
       <span>{_fullscreen_button()}</span>
     </div>
   </header>
@@ -501,6 +521,16 @@ def build_projects_compact_html(payload: dict, refresh_seconds: int = DEFAULT_RE
     .fullscreen-button:disabled {{
       color: var(--muted);
     }}
+    body.pseudo-fullscreen {{
+      padding: 6px;
+    }}
+    body.pseudo-fullscreen header {{
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+    }}
+    body.pseudo-fullscreen h1 {{
+      font-size: 24px;
+    }}
     .summary {{
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -577,7 +607,7 @@ def build_projects_compact_html(payload: dict, refresh_seconds: int = DEFAULT_RE
     <div class="meta">
       <span data-refresh-region="updated-time">Updated: {_format_display_time(payload.get("generated_at"))}</span>
       <span>Refresh: {int(refresh_seconds)}s</span>
-      <span><a href="/">Tasks</a></span>
+      <span><a href="/tasks">Tasks</a></span>
       <span><a href="/projects">Detailed</a></span>
       <span>{_fullscreen_button()}</span>
     </div>
@@ -625,7 +655,7 @@ def main(argv: Optional[list] = None) -> int:
 
     server = run_server(args.host, args.port, Path(args.codex_home), args.refresh_seconds)
     local_ip = _local_ip()
-    print(f"Serving Kindle Codex Tasks at http://{local_ip}:{args.port}/")
+    print(f"Serving Kindle Codex Project List at http://{local_ip}:{args.port}/")
     print(f"Local URL: http://127.0.0.1:{args.port}/")
     try:
         server.serve_forever()
@@ -650,9 +680,12 @@ def _make_handler(codex_home: Path, refresh_seconds: int) -> Callable:
             elif parsed.path == "/projects":
                 payload = build_projects_payload(codex_home)
                 self._send_html(build_projects_html(payload, refresh_seconds))
-            elif parsed.path in {"/", "/index.html"}:
+            elif parsed.path == "/tasks":
                 payload = build_tasks_payload(codex_home)
                 self._send_html(build_html(payload, refresh_seconds))
+            elif parsed.path in {"/", "/index.html"}:
+                payload = build_projects_payload(codex_home)
+                self._send_html(build_projects_compact_html(payload, refresh_seconds))
             else:
                 self.send_error(404, "Not found")
 
@@ -777,11 +810,17 @@ def _fullscreen_script() -> str:
           document.msFullscreenElement;
       }
       function updateButton() {
-        button.textContent = fullscreenElement() ? 'Exit fullscreen' : 'Fullscreen';
+        button.textContent = (fullscreenElement() || document.body.classList.contains('pseudo-fullscreen')) ?
+          'Exit fullscreen' :
+          'Fullscreen';
       }
       if (!requestFullscreen || !exitFullscreen) {
-        button.disabled = true;
-        button.textContent = 'Fullscreen unavailable';
+        document.body.classList.add('pseudo-fullscreen');
+        button.addEventListener('click', function () {
+          document.body.classList.toggle('pseudo-fullscreen');
+          updateButton();
+        });
+        updateButton();
         return;
       }
       button.addEventListener('click', function () {

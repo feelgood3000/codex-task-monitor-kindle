@@ -6,7 +6,8 @@ It watches your local `~/.codex` session files, groups recent Codex work into ta
 
 ## Features
 
-- Task dashboard at `/`
+- Compact project list homepage at `/`
+- Task dashboard at `/tasks`
 - Project dashboard at `/projects`
 - Compact project list at `/projects/compact`
 - JSON APIs at `/api/tasks` and `/api/projects`
@@ -31,7 +32,8 @@ python3 -m unittest discover -s tests
 
 ## Endpoints
 
-- `/` serves the Kindle-friendly HTML page.
+- `/` serves the compact project list homepage.
+- `/tasks` serves the task dashboard.
 - `/api/tasks` serves the same task summary as JSON.
 - `/projects` serves the project dashboard.
 - `/projects/compact` serves a compact project list.

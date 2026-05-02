@@ -1,7 +1,9 @@
 import json
 import tempfile
+import threading
 import unittest
 from datetime import datetime, timezone
+from http.client import HTTPConnection
 from pathlib import Path
 
 from codex_task_monitor.server import (
@@ -11,6 +13,7 @@ from codex_task_monitor.server import (
     build_projects_html,
     build_projects_payload,
     build_tasks_payload,
+    run_server,
 )
 
 
@@ -73,7 +76,7 @@ class ServerTests(unittest.TestCase):
 
         html = build_html(payload, refresh_seconds=60)
 
-        self.assertIn('<a href="/projects">Projects</a>', html)
+        self.assertIn('<a href="/">Projects</a>', html)
 
     def test_build_html_includes_fullscreen_button(self):
         payload = {
@@ -90,6 +93,8 @@ class ServerTests(unittest.TestCase):
         self.assertIn("Exit fullscreen", html)
         self.assertIn("tryAutoFullscreen", html)
         self.assertIn("window.addEventListener('load'", html)
+        self.assertIn("pseudo-fullscreen", html)
+        self.assertNotIn("Fullscreen unavailable", html)
 
     def test_build_html_compacts_tasks_older_than_five_minutes(self):
         payload = {
@@ -223,6 +228,8 @@ class ServerTests(unittest.TestCase):
         self.assertIn("Exit fullscreen", html)
         self.assertIn("tryAutoFullscreen", html)
         self.assertIn("window.addEventListener('load'", html)
+        self.assertIn("pseudo-fullscreen", html)
+        self.assertNotIn("Fullscreen unavailable", html)
 
     def test_build_projects_compact_html_renders_project_list_only(self):
         payload = {
@@ -262,6 +269,39 @@ class ServerTests(unittest.TestCase):
         self.assertIn("setInterval(refreshPageData", html)
         self.assertIn('data-refresh-region="updated-time"', html)
         self.assertIn("2026-05-02 14:00:00 UTC+8", html)
+
+    def test_homepage_serves_compact_projects_and_tasks_route_serves_tasks(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            codex_home = Path(tmp) / ".codex"
+            codex_home.mkdir()
+            (codex_home / "session_index.jsonl").write_text(
+                json.dumps({"id": "thread-1", "thread_name": "Task", "updated_at": "2026-05-02T06:00:00Z"})
+                + "\n",
+                encoding="utf-8",
+            )
+            server = run_server("127.0.0.1", 0, codex_home, 60)
+            thread = threading.Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            try:
+                port = server.server_address[1]
+                home = self._get_body(port, "/")
+                tasks = self._get_body(port, "/tasks")
+
+                self.assertIn("Kindle Codex Project List", home)
+                self.assertIn("Kindle Codex Tasks", tasks)
+            finally:
+                server.shutdown()
+                server.server_close()
+
+    def _get_body(self, port, path):
+        conn = HTTPConnection("127.0.0.1", port)
+        try:
+            conn.request("GET", path)
+            response = conn.getresponse()
+            self.assertEqual(response.status, 200)
+            return response.read().decode("utf-8")
+        finally:
+            conn.close()
 
 
 if __name__ == "__main__":
