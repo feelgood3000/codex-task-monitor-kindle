@@ -125,7 +125,7 @@ class ServerTests(unittest.TestCase):
             self.assertNotIn('aria-label="Task summary"', html)
             self.assertNotIn('aria-label="Project summary"', html)
 
-    def test_pages_do_not_render_fullscreen_controls(self):
+    def test_pages_render_fullscreen_controls(self):
         payload = {
             "generated_at": "2026-05-02T06:00:00Z",
             "counts": {"total": 0, "active": 0, "error": 0, "stale": 0},
@@ -144,11 +144,12 @@ class ServerTests(unittest.TestCase):
         ]
 
         for html in pages:
-            self.assertNotIn("fullscreen-button", html)
-            self.assertNotIn("requestFullscreen", html)
-            self.assertNotIn("exitFullscreen", html)
-            self.assertNotIn("pseudo-fullscreen", html)
-            self.assertNotIn("Exit fullscreen", html)
+            self.assertIn('<button type="button" id="fullscreen-button"', html)
+            self.assertIn("requestFullscreen", html)
+            self.assertIn("exitFullscreen", html)
+            self.assertIn("Exit fullscreen", html)
+            self.assertIn("tryNativeFullscreen", html)
+            self.assertIn("pseudo-fullscreen", html)
 
     def test_build_html_compacts_tasks_older_than_five_minutes(self):
         payload = {
